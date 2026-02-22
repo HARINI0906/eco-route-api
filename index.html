@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eco Route Finder 🌱</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #11998e, #38ef7d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #11998e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .result {
+            margin-top: 20px;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Eco Route Finder 🌍</h2>
+
+    <input type="text" id="source" placeholder="Enter Source">
+    <input type="text" id="destination" placeholder="Enter Destination">
+
+    <button type="button" onclick="calculateRoute()">Calculate Route</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+async function calculateRoute() {
+
+    const source = document.getElementById("source").value;
+    const destination = document.getElementById("destination").value;
+
+    try {
+        const response = await fetch("http://localhost:8000/route", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                source: source,
+                destination: destination
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            document.getElementById("result").innerHTML = data.error;
+            return;
+        }
+
+        document.getElementById("result").innerHTML =
+            "<b>Distance:</b> " + data.distance_km + " km<br><br>" +
+            "<b>Recommended:</b> 🌱 " + data.recommended_option + "<br><br>" +
+            "🚗 Car: " + data.emission_kg.car + " kg<br>" +
+            "🏍 Bike: " + data.emission_kg.bike + " kg<br>" +
+            "🚌 Bus: " + data.emission_kg.bus + " kg";
+
+    } catch (error) {
+        document.getElementById("result").innerHTML =
+            "Error connecting to backend!";
+    }
+}
+</script>
+
+</body>
+</html>
